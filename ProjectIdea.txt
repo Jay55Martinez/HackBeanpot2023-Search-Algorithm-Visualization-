@@ -1,0 +1,12 @@
+The project idea for HackBeanpot 2023:
+A program that visualizes different search algorithms. The user can place walls on 
+the screen to see how the search algorithm reacts to it.
+
+What we are going to need:
+- UX/UI interface
+    - Start botton
+    - Select the search algorithm that will be used
+- 25x25 tile with ablity to place/remove walls, start, and goal
+- Search algortihms: breadth first search/ depth first search
+- visualizing the search by coloring the tiles that have been searched in real time
+- highlights the final path
