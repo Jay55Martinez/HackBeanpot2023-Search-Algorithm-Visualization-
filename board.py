@@ -68,15 +68,13 @@ class State:
     """
     class represents the states on the board.
     The States are:
-    - not_searched
+    - start
     - searched
     - searching
     - target
     ...
     Attributes
     ----------
-    not_searched : bol
-        It can be searched by a searching cell
     seached : bol
         It has been searched and can no longer be searched
     seaching : bol
@@ -86,10 +84,8 @@ class State:
     . . .
     Methods
     -------
-    make_not_searched()
-        Sets not_searched to true.
-        throws error:
-            - if searched is true
+    make_start()
+        Sets start to true.
             
     make_searched()
         Sets searched to true.
@@ -99,8 +95,6 @@ class State:
     
     make_target()
         Sets target to true and not_searched to true.
-        throws error:
-            - if searched or searching is true
     """
     
     def __init__(self):
@@ -121,6 +115,10 @@ class State:
         
     def make_start(self):
         self.start = True
+        self.searched = True
+        
+    def gameover(self):
+        return self.target and self.searched
     
     def __str__(self):
         if self.target == True:
@@ -134,11 +132,49 @@ class State:
         else:
             return f'O'
 
+def deapth_first_search(board : Board, startx, starty):
+    visited = [[startx, starty]]
+    queue = []
+    queue.extend(neighbors(board, startx, starty))
+    
+    while queue:
+        board.board[queue[0][0]][queue[0][1]].make_searched()
+        print(board)
+        if board.board[queue[0][0]][queue[0][1]].gameover():
+            break
+        else:
+            print(queue)
+            visited.append(queue[0])
+            queue.extend(neighbors(board, queue[0][0], queue[0][1]))
+            queue = list({tuple(k): None for k in queue})
+            queue.pop(0)
+    
+
+def neighbors(board : Board, row, col):
+    neighbors = []
+    if row+1 < board.row_size:
+        if not board.board[row+1][col].searched:
+            print()
+            neighbors.append([row+1, col])
+    if col+1 < board.col_size: 
+        if not board.board[row][col+1].searched:               
+            neighbors.append([row, col+1])
+    if row-1 > board.row_size:
+        if not board.board[row-1][col].searched:
+            neighbors.append([row-1, col])
+    if col-1 > board.col_size:
+        if not board.board[row][col-1].searched:
+            neighbors.append(board.board[row, col-1])
+    return neighbors
+        
+    
+
 def main():
     board = Board(10, 10)
     board.add_start(0, 0)
-    board.add_target(9, 9)
+    board.add_target(4, 5)
     print(board)
-
+    deapth_first_search(board, 0, 0)
+\
 if __name__ == "__main__":
     main()
