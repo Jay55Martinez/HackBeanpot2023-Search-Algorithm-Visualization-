@@ -10,6 +10,14 @@ class Controller:
         a dictionary that correlates the name of an algorithm to its function object
     board : Board
         the board
+    start_row : int
+        the Y index of the starting point for the algorithm
+    start_col : int
+        the X index of the starting point for the algorithm
+    end_row : int
+        the Y index of the ending point for the algorithm
+    end_col : int
+        the X index of the ending point for the algorithm
     ...
     Methods
     -------
