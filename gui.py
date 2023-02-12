@@ -37,6 +37,7 @@ class BlockPlacer:
             root, text="Place Block", command=self.start_placing_block
         )
         self.place_block_button.pack()
+        self.to_delete = []
 
         # self.delete_block_button = tk.Button(
         #     root, text="Delete Block", command=self.delete_block
@@ -142,27 +143,26 @@ class BlockPlacer:
         )
 
     def create_oval(self, x, y, fill):
-        self.canvas.create_oval(
+        var = self.canvas.create_oval(
             x + self.grid_size / 2 - 10,
             y + self.grid_size / 2 - 10,
             x + self.grid_size / 2 + 10,
             y + self.grid_size / 2 + 10,
             fill=fill,
         )
-        return self.canvas.create_oval
+        return var
 
     def reset(self):
-        for x in range(self.grid_dimension):
-            x = x * self.grid_spacing
-            for y in range(self.grid_dimension):
-                y = y * self.grid_spacing
-                item = self.canvas.find_closest(x, y)[0]
-                try:
-                    self.canvas.delete(self.selected_item)
-                    self.blocks.remove(self.selected_item)
-                    print(f"removed {x}, {y}")
-                except ValueError:
-                    print(f"Not found {x}, {y}")
+        if self.start_flags:
+            self.canvas.delete(self.start_flags.pop(0))
+        if self.end_flags:
+            self.canvas.delete(self.end_flags.pop(0))
+        for block in self.blocks:
+            self.canvas.delete(block)
+        self.blocks = []
+        for dot in self.to_delete:
+            self.canvas.delete(dot)
+        self.to_delete = []
 
     def run(self):
         self.set_zero_states()
@@ -193,13 +193,13 @@ class BlockPlacer:
             root.tksleep(150)
             grid_x = x * self.grid_spacing
             grid_y = y * self.grid_spacing
-            self.create_oval(grid_x, grid_y, "yellow")
+            self.to_delete.append(self.create_oval(grid_x, grid_y, "yellow"))
             self.label["text"] = f"Searching: {x}, {y}"
         for x, y in found_path[1:-1]:
             root.tksleep(150)
             grid_x = x * self.grid_spacing
             grid_y = y * self.grid_spacing
-            self.create_oval(grid_x, grid_y, "green")
+            self.to_delete.append(self.create_oval(grid_x, grid_y, "green"))
             self.label["text"] = f"Best path length: {len(found_path)}"
 
 
