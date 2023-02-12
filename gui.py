@@ -1,4 +1,5 @@
 import tkinter as tk
+from board import Board, breath_first_search
 
 
 class BlockPlacer:
@@ -149,13 +150,30 @@ class BlockPlacer:
         print(self.end_loc)
         print(self.grid_dimension)
         print(self.grid_spacing)
-        pretend_grid = [(0, 1), (1, 1), (2, 1)]
-        for x, y in pretend_grid:
-            root.tksleep(500)
+        board = Board(self.grid_dimension, self.grid_dimension)
+        start_x = self.start_loc[0] // self.grid_spacing
+        start_y = self.start_loc[1] // self.grid_spacing
+        board.add_start((start_x, start_y))
+        end_x = self.end_loc[0] // self.grid_spacing
+        end_y = self.end_loc[1] // self.grid_spacing
+        board.add_target((end_x, end_y))
+        found_path, search_list = breath_first_search(
+            board, (start_x, start_y)
+        )
+        print(found_path)
+        print(search_list)
+        for x, y in search_list[1:-1]:
+            root.tksleep(150)
             grid_x = x * self.grid_spacing
             grid_y = y * self.grid_spacing
             self.create_oval(grid_x, grid_y, "yellow")
-            self.label["text"] = f"{x}"
+            self.label["text"] = f"Searching: {x}, {y}"
+        for x, y in found_path[1:-1]:
+            root.tksleep(150)
+            grid_x = x * self.grid_spacing
+            grid_y = y * self.grid_spacing
+            self.create_oval(grid_x, grid_y, "green")
+            self.label["text"] = f"Best path length: {len(found_path)}"
 
 
 def tksleep(self, time: int) -> None:

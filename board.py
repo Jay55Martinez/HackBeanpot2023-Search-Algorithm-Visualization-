@@ -32,7 +32,7 @@ class Board:
         throws error:
             - if the cords are larger than the boards dims
             - if there already is a start on the board
-            
+
     validate_location(row, col)
         Returns true if the given cords are in the array false otherwise
     """
@@ -46,7 +46,12 @@ class Board:
 
     def validate_location(self, coord):
         row, col = coord
-        if 0 <= row and  row < self.row_size and 0 <= col and col < self.col_size:
+        if (
+            0 <= row
+            and row < self.row_size
+            and 0 <= col
+            and col < self.col_size
+        ):
             if not self.board[row][col].searched:
                 return True
         else:
@@ -55,26 +60,26 @@ class Board:
     def add_target(self, coord):
         row, col = coord
         if not self.validate_location(coord):
-            raise IndexError('cords out of bounds')
+            raise IndexError("cords out of bounds")
         self.board[row][col].make_target()
 
     def add_start(self, coord):
         row, col = coord
         if not self.validate_location(coord):
-            raise IndexError('cords out of bounds')
+            raise IndexError("cords out of bounds")
         self.board[row][col].make_start()
 
     def add_wall(self, coord):
         row, col = coord
         if not self.validate_location(coord):
-            raise IndexError('cords out of bounds')
+            raise IndexError("cords out of bounds")
         self.board[row][col].make_wall()
-    
+
     def add_path(self, path):
         for coord in path:
             row, col = coord
             self.board[row][col].make_path()
-        
+
     def __str__(self):
         string_board = ""
         for row in self.board:
@@ -119,10 +124,10 @@ class State:
 
     make_target()
         Sets target to true and not_searched to true.
-        
+
     make_wall()
         Sets wall and searched to true.
-        
+
     gameover()
         returns if the State is target and searched
     """
@@ -147,7 +152,7 @@ class State:
     def make_start(self):
         self.start = True
         self.searched = True
-        
+
     def make_wall(self):
         self.wall = True
         self.searched = True
@@ -171,7 +176,7 @@ class State:
 
 
 # runs breath first search on the specified board given a start location
-def breapth_first_search(board: Board, starting_node):
+def breath_first_search(board: Board, starting_node):
     search_list = []
     visited_nodes = set()
     path_sofar = []
@@ -183,11 +188,11 @@ def breapth_first_search(board: Board, starting_node):
         path.append(current_node)
         board.board[current_node[0]][current_node[1]].make_searched()
         visited_nodes.add(current_node)
-        
+
         if board.board[current_node[0]][current_node[1]].gameover():
             board.add_path(path)
             return path, search_list
-        
+
         current_node_neighbors = neighbors(board, current_node)
         for node in current_node_neighbors:
             if node not in visited_nodes:
@@ -195,40 +200,42 @@ def breapth_first_search(board: Board, starting_node):
                 visited_nodes.add(node)
     return None, search_list
 
+
 # gets the unsearched neighbors adjacent to the specifed cord
 def neighbors(board: Board, node):
     row, col = node
     neighbors = []
-    coords = [(row+1, col), (row, col+1), (row-1, col), (row, col-1)]
+    coords = [(row + 1, col), (row, col + 1), (row - 1, col), (row, col - 1)]
     for coord in coords:
         if board.validate_location(coord):
-            neighbors.append(coord) 
+            neighbors.append(coord)
 
     return neighbors
 
-def deapth_first_search(board: Board, starting_node):
+
+def depth_first_search(board: Board, starting_node):
     search_list = []
     visited_nodes = set()
     path_sofar = []
     queue = [[starting_node, path_sofar]]
-    
+
     while queue:
         current_node, path = queue.pop(0)
         path.append(current_node)
         search_list.append(current_node)
         board.board[current_node[0]][current_node[1]].make_searched()
         visited_nodes.add(current_node)
-        
+
         if board.board[current_node[0]][current_node[1]].gameover():
             board.add_path(path)
             return path, search_list
-        
+
         current_node_neighbors = neighbors(board, current_node)
         for node in current_node_neighbors:
             if node not in visited_nodes:
                 queue.insert(0, [node, path.copy()])
                 visited_nodes.add(node)
-        
+
     return None, search_list
 
 
@@ -238,15 +245,16 @@ def main():
     board.add_target((4, 5))
     board.add_wall((0, 1))
     board.add_wall((1, 1))
-    breapth_first_search(board, (0, 0))
+    breath_first_search(board, (0, 0))
     print(board)
-    board2 = Board(10,10)
+    board2 = Board(10, 10)
     board2.add_start((0, 0))
     board2.add_target((4, 5))
     board2.add_wall((0, 1))
     board2.add_wall((1, 1))
-    deapth_first_search(board2, (0,0))
+    depth_first_search(board2, (0, 0))
     print(board2)
+
 
 if __name__ == "__main__":
     main()
