@@ -172,26 +172,28 @@ class State:
 
 # runs breath first search on the specified board given a start location
 def breapth_first_search(board: Board, starting_node):
+    search_list = []
     visited_nodes = set()
     path_sofar = []
     queue = [[starting_node, path_sofar]]
 
     while queue:
         current_node, path = queue.pop(0)
+        search_list.append(current_node)
         path.append(current_node)
         board.board[current_node[0]][current_node[1]].make_searched()
         visited_nodes.add(current_node)
         
         if board.board[current_node[0]][current_node[1]].gameover():
             board.add_path(path)
-            return path
+            return path, search_list
         
         current_node_neighbors = neighbors(board, current_node)
         for node in current_node_neighbors:
             if node not in visited_nodes:
                 queue.append([node, path.copy()])
                 visited_nodes.add(node)
-    return None
+    return None, search_list
 
 # gets the unsearched neighbors adjacent to the specifed cord
 def neighbors(board: Board, node):
@@ -205,6 +207,7 @@ def neighbors(board: Board, node):
     return neighbors
 
 def deapth_first_search(board: Board, starting_node):
+    search_list = []
     visited_nodes = set()
     path_sofar = []
     queue = [[starting_node, path_sofar]]
@@ -212,12 +215,13 @@ def deapth_first_search(board: Board, starting_node):
     while queue:
         current_node, path = queue.pop(0)
         path.append(current_node)
+        search_list.append(current_node)
         board.board[current_node[0]][current_node[1]].make_searched()
         visited_nodes.add(current_node)
         
         if board.board[current_node[0]][current_node[1]].gameover():
             board.add_path(path)
-            return path
+            return path, search_list
         
         current_node_neighbors = neighbors(board, current_node)
         for node in current_node_neighbors:
@@ -225,13 +229,15 @@ def deapth_first_search(board: Board, starting_node):
                 queue.insert(0, [node, path.copy()])
                 visited_nodes.add(node)
         
-    return None
+    return None, search_list
 
 
 def main():
     board = Board(10, 10)
     board.add_start((0, 0))
     board.add_target((4, 5))
+    board.add_wall((0, 1))
+    board.add_wall((1, 1))
     breapth_first_search(board, (0, 0))
     print(board)
     board2 = Board(10,10)
