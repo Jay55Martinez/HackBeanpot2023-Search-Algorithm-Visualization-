@@ -13,6 +13,12 @@ What we are going to need:
 - visualizing the search by coloring the tiles that have been searched in real time
 - highlights the final path
 
+Elevator Pitch:
+Want a fun interactive way to learn how different search algorithms work? Well we have you covered
+with our GUI python program that does just that. Be amazed at how breath first search will always 
+find best path and witness the speed of depth first search but the less optimal path it finds.
+If a program is going to get people excited about search algorithms it is going to be ours!
+
 Greatest Challenge We Overcame:
 The hardest part of the project was getting the GUI to communicate with the model. Since it was many of
 our first time with Python and with tkinter, the GUI library, it was hard for us. In the end we were 
