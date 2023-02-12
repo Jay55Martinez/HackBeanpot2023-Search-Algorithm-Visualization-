@@ -41,27 +41,27 @@ class Board:
             [State() for _ in range(col_size)] for _ in range(row_size)
         ]
 
-    def add_target(self, row, col):
+    def validate_location(self, row, col):
         if row > self.row_size or col > self.col_size:
-            raise IndexError("target Index Error")
+            raise IndexError(f"Index Error, {row}, {col} out of bounds")
+
+    def add_target(self, row, col):
+        self.validate_location(row, col)
         self.board[row][col].make_target()
 
     def add_start(self, row, col):
-        if row > self.row_size or col > self.col_size:
-            raise IndexError("target Index Error")
+        self.validate_location(row, col)
         self.board[row][col].make_start()
 
     def add_wall(self, row, col):
-        if row > self.row_size or col > self.col_size:
-            raise IndexError("target Index Error")
+        self.validate_location(row, col)
         self.board[row][col].make_searched()
 
     def __str__(self):
         string_board = ""
-        for row in range(self.row_size):
-            for col in range(self.col_size):
-                string_board += str(self.board[row][col])
-            string_board += "\n"
+        for row in self.board:
+            row_string = "".join(str(col) for col in row)
+            string_board += f"{row_string}\n"
         return string_board
 
 
@@ -135,6 +135,7 @@ class State:
 
 
 def deapth_first_search(board: Board, startx, starty):
+
     visited = [[startx, starty]]
     queue = []
     queue.extend(neighbors(board, startx, starty))
