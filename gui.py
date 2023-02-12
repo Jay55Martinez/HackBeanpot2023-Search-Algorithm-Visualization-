@@ -14,6 +14,7 @@ class BlockPlacer:
         )
         self.canvas.pack()
         self.blocks = []
+        self.block_locs = []
         self.start_flags = []
         self.end_flags = []
         self.set_zero_states()
@@ -52,6 +53,12 @@ class BlockPlacer:
             command=self.run,
         )
         self.run.pack()
+        self.reset = tk.Button(
+            root,
+            text="Reset",
+            command=self.reset,
+        )
+        self.reset.pack()
 
     def set_zero_states(self):
         self.placing_block = False
@@ -90,6 +97,7 @@ class BlockPlacer:
         if self.placing_block:
             x, y = self.get_grid_coordinates(event.x, event.y)
             print("location is", x, y)
+            self.block_locs.append((x, y))
             self.blocks.append(
                 self.canvas.create_rectangle(
                     x, y, x + self.grid_size, y + self.grid_size, fill="white"
@@ -143,6 +151,19 @@ class BlockPlacer:
         )
         return self.canvas.create_oval
 
+    def reset(self):
+        for x in range(self.grid_dimension):
+            x = x * self.grid_spacing
+            for y in range(self.grid_dimension):
+                y = y * self.grid_spacing
+                item = self.canvas.find_closest(x, y)[0]
+                try:
+                    self.canvas.delete(self.selected_item)
+                    self.blocks.remove(self.selected_item)
+                    print(f"removed {x}, {y}")
+                except ValueError:
+                    print(f"Not found {x}, {y}")
+
     def run(self):
         self.set_zero_states()
         self.label["text"] = "Running"
@@ -157,6 +178,12 @@ class BlockPlacer:
         end_x = self.end_loc[0] // self.grid_spacing
         end_y = self.end_loc[1] // self.grid_spacing
         board.add_target((end_x, end_y))
+        block_locs = [
+            (loc[0] // self.grid_spacing, loc[1] // self.grid_spacing)
+            for loc in self.block_locs
+        ]
+        for block_loc in block_locs:
+            board.add_wall(block_loc)
         found_path, search_list = breath_first_search(
             board, (start_x, start_y)
         )
