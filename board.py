@@ -206,7 +206,7 @@ def neighbors(board: Board, node):
 
     return neighbors
 
-def deapth_first_search(board: Board, starting_node):
+def depth_first_search(board: Board, starting_node):
     search_list = []
     visited_nodes = set()
     path_sofar = []
@@ -231,7 +231,6 @@ def deapth_first_search(board: Board, starting_node):
         
     return None, search_list
 
-
 def main():
     board = Board(10, 10)
     board.add_start((0, 0))
@@ -245,7 +244,7 @@ def main():
     board2.add_target((4, 5))
     board2.add_wall((0, 1))
     board2.add_wall((1, 1))
-    deapth_first_search(board2, (0,0))
+    depth_first_search(board2, (0,0))
     print(board2)
 
 if __name__ == "__main__":
