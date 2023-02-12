@@ -19,5 +19,5 @@ our first time with Python and with tkinter, the GUI library, it was hard for us
 able to get the model to communicate with the view.
 
 What We Learned:
-It was most of our first time working with Python and we all learned a lot. Even the people those who have
- used Python in the past still learned something new by working with the tkinter library.
+It was most of our first time working with Python and we all learned a lot. Even the people who have
+used Python in the past still learned something new by working with the tkinter library.
