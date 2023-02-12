@@ -253,6 +253,7 @@ def main():
     board2.add_wall((0, 1))
     board2.add_wall((1, 1))
     depth_first_search(board2, (0, 0))
+
     print(board2)
 
 
