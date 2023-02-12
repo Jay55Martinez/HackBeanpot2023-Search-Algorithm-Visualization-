@@ -4,7 +4,13 @@ import tkinter as tk
 class BlockPlacer:
     def __init__(self, root):
         self.root = root
-        self.canvas = tk.Canvas(root, width=500, height=500, bg="black")
+        self.grid_dimension = 10
+        self.grid_size = 50
+        self.grid_spacing = self.grid_size
+        actual_height = self.grid_size * self.grid_dimension
+        self.canvas = tk.Canvas(
+            root, width=actual_height, height=actual_height, bg="black"
+        )
         self.canvas.pack()
         self.blocks = []
         self.start_flags = []
@@ -35,9 +41,6 @@ class BlockPlacer:
         # )
         # self.delete_block_button.pack()
         self.canvas.bind("<Button-1>", self.place_object)
-        grid_distance = 50
-        self.grid_size = grid_distance
-        self.grid_spacing = grid_distance
         self.draw_grid()
         self.label = tk.Label(root, text="")
         # this creates a new label to the GUI
@@ -97,30 +100,15 @@ class BlockPlacer:
                 self.canvas.delete(self.start_flags.pop(0))
             x, y = self.get_grid_coordinates(event.x, event.y)
             self.start_loc = x, y
-            self.start_flags.append(
-                self.canvas.create_oval(
-                    x + self.grid_size / 2 - 10,
-                    y + self.grid_size / 2 - 10,
-                    x + self.grid_size / 2 + 10,
-                    y + self.grid_size / 2 + 10,
-                    fill="red",
-                )
-            )
+            self.start_flags.append(self.create_oval(x, y, "red"))
             # self.placing_start_flag = False
         elif self.placing_end_flag:
             if len(self.end_flags) >= 1:
                 self.canvas.delete(self.end_flags.pop(0))
             x, y = self.get_grid_coordinates(event.x, event.y)
             self.end_loc = x, y
-            self.end_flags.append(
-                self.canvas.create_oval(
-                    x + self.grid_size / 2 - 10,
-                    y + self.grid_size / 2 - 10,
-                    x + self.grid_size / 2 + 10,
-                    y + self.grid_size / 2 + 10,
-                    fill="Blue",
-                )
-            )
+            self.end_flags.append(self.create_oval(x, y, "Blue"))
+
             # self.placing_start_flag = False
         else:
             self.selected_item = self.canvas.find_closest(event.x, event.y)[0]
@@ -144,13 +132,46 @@ class BlockPlacer:
             self.grid_spacing * int(y / self.grid_spacing)
         )
 
+    def create_oval(self, x, y, fill):
+        self.canvas.create_oval(
+            x + self.grid_size / 2 - 10,
+            y + self.grid_size / 2 - 10,
+            x + self.grid_size / 2 + 10,
+            y + self.grid_size / 2 + 10,
+            fill=fill,
+        )
+        return self.canvas.create_oval
+
     def run(self):
         self.set_zero_states()
         self.label["text"] = "Running"
         print(self.start_loc)
         print(self.end_loc)
+        print(self.grid_dimension)
+        print(self.grid_spacing)
+        pretend_grid = [(0, 1), (1, 1), (2, 1)]
+        for x, y in pretend_grid:
+            root.tksleep(500)
+            grid_x = x * self.grid_spacing
+            grid_y = y * self.grid_spacing
+            self.create_oval(grid_x, grid_y, "yellow")
+            self.label["text"] = f"{x}"
 
 
+def tksleep(self, time: int) -> None:
+    """
+    Emulating `time.sleep(milliseconds)`
+    Created by TheLizzard, inspired by Thingamabobs
+    """
+    self.after(time, self.quit)
+    self.mainloop()
+
+
+tk.Misc.tksleep = tksleep
+
+# # Example
+# root = tk.Tk()
+# root.tksleep(2)
 root = tk.Tk()
 app = BlockPlacer(root)
 root.mainloop()
