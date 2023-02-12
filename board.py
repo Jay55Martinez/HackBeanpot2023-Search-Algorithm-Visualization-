@@ -31,7 +31,10 @@ class Board:
         adds a wall to the board at the specified cords.
         throws error:
             - if the cords are larger than the boards dims
-            - if the specified cell contains a State that is not not searched
+            - if there already is a start on the board
+            
+    validate_location(row, col)
+        Returns true if the given cords are in the array false otherwise
     """
 
     def __init__(self, row_size, col_size):
@@ -41,22 +44,37 @@ class Board:
             [State() for _ in range(col_size)] for _ in range(row_size)
         ]
 
-    def validate_location(self, row, col):
-        if row > self.row_size or col > self.col_size:
-            raise IndexError(f"Index Error, {row}, {col} out of bounds")
+    def validate_location(self, coord):
+        row, col = coord
+        if 0 <= row and  row < self.row_size and 0 <= col and col < self.col_size:
+            if not self.board[row][col].searched:
+                return True
+        else:
+            return False
 
-    def add_target(self, row, col):
-        self.validate_location(row, col)
+    def add_target(self, coord):
+        row, col = coord
+        if not self.validate_location(coord):
+            raise IndexError('cords out of bounds')
         self.board[row][col].make_target()
 
-    def add_start(self, row, col):
-        self.validate_location(row, col)
+    def add_start(self, coord):
+        row, col = coord
+        if not self.validate_location(coord):
+            raise IndexError('cords out of bounds')
         self.board[row][col].make_start()
 
-    def add_wall(self, row, col):
-        self.validate_location(row, col)
-        self.board[row][col].make_searched()
-
+    def add_wall(self, coord):
+        row, col = coord
+        if not self.validate_location(coord):
+            raise IndexError('cords out of bounds')
+        self.board[row][col].make_wall()
+    
+    def add_path(self, path):
+        for coord in path:
+            row, col = coord
+            self.board[row][col].make_path()
+        
     def __str__(self):
         string_board = ""
         for row in self.board:
@@ -71,17 +89,22 @@ class State:
     The States are:
     - start
     - searched
-    - searching
+    - wall
+    - path
     - target
     ...
     Attributes
     ----------
-    seached : bol
+    searched : bol
         It has been searched and can no longer be searched
-    seaching : bol
-        Where the search wil expand from
+    start : bol
+        Where the algorithm will start from
     target : bol
         The search ends once the target is reached
+    wall : bol
+        Can not be searched
+    path : bol
+        Path that the algorithm takes
     . . .
     Methods
     -------
@@ -91,11 +114,14 @@ class State:
     make_searched()
         Sets searched to true.
 
-    make_searching()
-        Sets searching to true.
+    make_path()
+        Sets path to true.
 
     make_target()
         Sets target to true and not_searched to true.
+        
+    make_wall()
+        Sets wall and searched to true.
         
     gameover()
         returns if the State is target and searched
@@ -103,15 +129,16 @@ class State:
 
     def __init__(self):
         self.searched = False
-        self.searching = False
+        self.path = False
         self.target = False
         self.start = False
+        self.wall = False
 
     def make_searched(self):
         self.searched = True
 
-    def make_searching(self):
-        self.searching = True
+    def make_path(self):
+        self.path = True
         self.searched = True
 
     def make_target(self):
@@ -119,6 +146,10 @@ class State:
 
     def make_start(self):
         self.start = True
+        self.searched = True
+        
+    def make_wall(self):
+        self.wall = True
         self.searched = True
 
     def gameover(self):
@@ -129,17 +160,19 @@ class State:
             return "F"
         elif self.start == True:
             return "S"
+        elif self.wall == True:
+            return "|"
+        elif self.path == True:
+            return "-"
         elif self.searched == True:
             return "x"
-        elif self.searching == True:
-            return "X"
         else:
             return "O"
 
 
-def breapth_first_search(board: Board, startx, starty):
+# runs breath first search on the specified board given a start location
+def breapth_first_search(board: Board, starting_node):
     visited_nodes = set()
-    starting_node = (startx, starty)
     path_sofar = []
     queue = [[starting_node, path_sofar]]
 
@@ -148,46 +181,66 @@ def breapth_first_search(board: Board, startx, starty):
         path.append(current_node)
         board.board[current_node[0]][current_node[1]].make_searched()
         visited_nodes.add(current_node)
-        print(board)
         
         if board.board[current_node[0]][current_node[1]].gameover():
+            board.add_path(path)
             return path
         
         current_node_neighbors = neighbors(board, current_node)
         for node in current_node_neighbors:
             if node not in visited_nodes:
-                print(node)
                 queue.append([node, path.copy()])
-                print(queue)
                 visited_nodes.add(node)
     return None
 
-
+# gets the unsearched neighbors adjacent to the specifed cord
 def neighbors(board: Board, node):
     row, col = node
     neighbors = []
-    if row + 1 < board.row_size:
-        if not board.board[row + 1][col].searched:
-            print()
-            neighbors.append((row + 1, col))
-    if col + 1 < board.col_size:
-        if not board.board[row][col + 1].searched:
-            neighbors.append((row, col + 1))
-    if row - 1 > board.row_size:
-        if not board.board[row - 1][col].searched:
-            neighbors.append((row - 1, col))
-    if col - 1 > board.col_size:
-        if not board.board[row][col - 1].searched:
-            neighbors.append((row, col - 1))
+    coords = [(row+1, col), (row, col+1), (row-1, col), (row, col-1)]
+    for coord in coords:
+        if board.validate_location(coord):
+            neighbors.append(coord) 
+
     return neighbors
+
+def deapth_first_search(board: Board, starting_node):
+    visited_nodes = set()
+    path_sofar = []
+    queue = [[starting_node, path_sofar]]
+    
+    while queue:
+        current_node, path = queue.pop(0)
+        path.append(current_node)
+        board.board[current_node[0]][current_node[1]].make_searched()
+        visited_nodes.add(current_node)
+        
+        if board.board[current_node[0]][current_node[1]].gameover():
+            board.add_path(path)
+            return path
+        
+        current_node_neighbors = neighbors(board, current_node)
+        for node in current_node_neighbors:
+            if node not in visited_nodes:
+                queue.insert(0, [node, path.copy()])
+                visited_nodes.add(node)
+        
+    return None
 
 
 def main():
     board = Board(10, 10)
-    board.add_start(0, 0)
-    board.add_target(4, 5)
-    print(breapth_first_search(board, 0, 0))
-
+    board.add_start((0, 0))
+    board.add_target((4, 5))
+    breapth_first_search(board, (0, 0))
+    print(board)
+    board2 = Board(10,10)
+    board2.add_start((0, 0))
+    board2.add_target((4, 5))
+    board2.add_wall((0, 1))
+    board2.add_wall((1, 1))
+    deapth_first_search(board2, (0,0))
+    print(board2)
 
 if __name__ == "__main__":
     main()
