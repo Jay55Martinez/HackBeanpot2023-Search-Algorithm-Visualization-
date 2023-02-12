@@ -96,6 +96,9 @@ class State:
 
     make_target()
         Sets target to true and not_searched to true.
+        
+    gameover()
+        returns if the State is target and searched
     """
 
     def __init__(self):
@@ -134,40 +137,48 @@ class State:
             return "O"
 
 
-def deapth_first_search(board: Board, startx, starty):
-
-    visited = [[startx, starty]]
-    queue = []
-    queue.extend(neighbors(board, startx, starty))
+def breapth_first_search(board: Board, startx, starty):
+    visited_nodes = set()
+    starting_node = (startx, starty)
+    path_sofar = []
+    queue = [[starting_node, path_sofar]]
 
     while queue:
-        board.board[queue[0][0]][queue[0][1]].make_searched()
+        current_node, path = queue.pop(0)
+        path.append(current_node)
+        board.board[current_node[0]][current_node[1]].make_searched()
+        visited_nodes.add(current_node)
         print(board)
-        if board.board[queue[0][0]][queue[0][1]].gameover():
-            break
-        else:
-            print(queue)
-            visited.append(queue[0])
-            queue.extend(neighbors(board, queue[0][0], queue[0][1]))
-            queue = list({tuple(k): None for k in queue})
-            queue.pop(0)
+        
+        if board.board[current_node[0]][current_node[1]].gameover():
+            return path
+        
+        current_node_neighbors = neighbors(board, current_node)
+        for node in current_node_neighbors:
+            if node not in visited_nodes:
+                print(node)
+                queue.append([node, path.copy()])
+                print(queue)
+                visited_nodes.add(node)
+    return None
 
 
-def neighbors(board: Board, row, col):
+def neighbors(board: Board, node):
+    row, col = node
     neighbors = []
     if row + 1 < board.row_size:
         if not board.board[row + 1][col].searched:
             print()
-            neighbors.append([row + 1, col])
+            neighbors.append((row + 1, col))
     if col + 1 < board.col_size:
         if not board.board[row][col + 1].searched:
-            neighbors.append([row, col + 1])
+            neighbors.append((row, col + 1))
     if row - 1 > board.row_size:
         if not board.board[row - 1][col].searched:
-            neighbors.append([row - 1, col])
+            neighbors.append((row - 1, col))
     if col - 1 > board.col_size:
         if not board.board[row][col - 1].searched:
-            neighbors.append(board.board[row, col - 1])
+            neighbors.append((row, col - 1))
     return neighbors
 
 
@@ -175,8 +186,7 @@ def main():
     board = Board(10, 10)
     board.add_start(0, 0)
     board.add_target(4, 5)
-    print(board)
-    deapth_first_search(board, 0, 0)
+    print(breapth_first_search(board, 0, 0))
 
 
 if __name__ == "__main__":
