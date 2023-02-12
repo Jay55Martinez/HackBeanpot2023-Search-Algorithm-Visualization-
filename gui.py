@@ -160,6 +160,10 @@ class BlockPlacer:
         for block in self.blocks:
             self.canvas.delete(block)
         self.blocks = []
+        self.block_locs = []
+        self.set_zero_states()
+        self.start_loc = None
+        self.end_loc = None
         for dot in self.to_delete:
             self.canvas.delete(dot)
         self.to_delete = []
