@@ -2,7 +2,7 @@ The project idea for HackBeanpot 2023:
 A program that visualizes different search algorithms. The user can place walls on 
 the screen to see how the search algorithm reacts to it.
 
-Slack Handles: Jay Martinez, 
+Slack Handles: Jay Martinez, Darr, Noah Young, Kris Martinez, Jamal Merritt
 
 What we are going to need:
 - UX/UI interface
