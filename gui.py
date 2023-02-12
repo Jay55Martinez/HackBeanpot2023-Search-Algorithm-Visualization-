@@ -1,5 +1,5 @@
 import tkinter as tk
-from board import Board, breath_first_search
+from board import Board, breath_first_search, depth_first_search
 
 
 class BlockPlacer:
@@ -48,12 +48,18 @@ class BlockPlacer:
         self.label = tk.Label(root, text="")
         # this creates a new label to the GUI
         self.label.pack()
-        self.run = tk.Button(
+        self.run_bfs = tk.Button(
             root,
-            text="Run path finding algorithm",
-            command=self.run,
+            text="Run BFS",
+            command=lambda: self.run("bfs"),
         )
-        self.run.pack()
+        self.run_bfs.pack()
+        self.run_dfs = tk.Button(
+            root,
+            text="Run DFS",
+            command=lambda: self.run("dfs"),
+        )
+        self.run_dfs.pack()
         self.reset = tk.Button(
             root,
             text="Reset",
@@ -168,7 +174,9 @@ class BlockPlacer:
             self.canvas.delete(dot)
         self.to_delete = []
 
-    def run(self):
+    def run(self, algo):
+        algo_mapping = {"bfs": breath_first_search, "dfs": depth_first_search}
+        algo_to_run = algo_mapping[algo]
         self.set_zero_states()
         self.label["text"] = "Running"
         print(self.start_loc)
@@ -188,9 +196,7 @@ class BlockPlacer:
         ]
         for block_loc in block_locs:
             board.add_wall(block_loc)
-        found_path, search_list = breath_first_search(
-            board, (start_x, start_y)
-        )
+        found_path, search_list = algo_to_run(board, (start_x, start_y))
         print(found_path)
         print(search_list)
         for x, y in search_list[1:-1]:
